@@ -53,7 +53,6 @@ pub mod axum_middleware;
 // #[cfg(feature = "actix-middleware")]
 // pub mod actix_middleware;
 
-// Re-exports for convenience
 pub use config::SuperTokensConfig;
 pub use errors::{Result, SuperTokensError};
 pub use session::{SessionContext, SessionInfo, refresh_session, revoke_session, verify_session};
