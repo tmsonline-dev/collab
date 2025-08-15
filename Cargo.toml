@@ -2,5 +2,124 @@
 name = "collab"
 version = "0.1.0"
 edition = "2024"
+authors = ["Tom <tmsonlinezoho@outlook.com>"]
+description = "Unofficial Rust SDK for SuperTokens authentication and authorization"
+license = "MIT OR Apache-2.0"
+keywords = [
+    "authentication",
+    "authorization",
+    "supertokens",
+    "oauth2",
+    "webauthn",
+]
+categories = ["authentication", "web-programming"]
+repository = "https://github.com/tmson-dev/supertokens-sdk"
+documentation = "https://docs.rs/supertokens-sdk"
+readme = "README.md"
+exclude = ["examples/", "tests/", "docs/", ".github/"]
 
 [dependencies]
+axum = { version = "0.8.4", optional = true }
+base64 = "0.22.1"
+chrono = { version = "0.4.41", features = ["serde"] }
+dotenvy = "0.15.7"
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.142"
+thiserror = "2.0.14"
+tower = { version = "0.5.2", optional = true }
+tower-layer = { version = "0.3.3", optional = true }
+url = "2.5.4"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "time"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Utility dependencies
+regex = "1.0"
+rand = "0.8"
+pbkdf2 = "0.12"
+sha2 = "0.10"
+urlencoding = "2.1"
+log = "0.4"
+jsonwebtoken = "9.3.1"
+
+# Optional framework integrations
+# actix-web = { version = "4.0", optional = true }
+
+
+[features]
+default = [
+    "email-password",
+    "axum-middleware",
+    "dashboard",
+    "user-roles",
+    "email-verification",
+    "jwt",
+]
+all-recipes = ["email-password", "passwordless", "webauthn", "oauth2"]
+axum = ["dep:axum"]
+axum-middleware = ["axum", "tower", "tower-layer"]
+email-password = []
+oauth2 = []
+passwordless = []
+tower = ["dep:tower"]
+tower-layer = ["dep:tower-layer"]
+webauthn = []
+dashboard = []
+
+# actix-middleware = ["actix-web"]
+
+# Authorization & verification
+user-roles = []
+email-verification = []
+multi-factor-auth = []
+
+# Management & integration
+account-linking = []
+multitenancy = []
+jwt = []
+
+# Convenience feature combinations
+all-auth = ["email-password", "passwordless", "webauthn", "oauth2"]
+all-verification = ["email-verification", "multi-factor-auth"]
+all-authorization = ["user-roles"]
+all-management = ["account-linking", "dashboard", "multitenancy"]
+# all-middleware = ["axum-middleware", "actix-middleware"]
+# all-features = ["all-recipes", "all-middleware"]
+
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.0"
+env_logger = "0.10"
+
+# [[example]]
+# name = "basic_usage_example"
+# required-features = ["email-password"]
+
+# [[example]]
+# name = "axum_integration_example"
+# required-features = ["axum-middleware", "email-password"]
+
+# [[example]]
+# name = "user_roles_example"
+# required-features = ["user-roles", "email-password"]
+
+# [[example]]
+# name = "mfa_example"
+# required-features = ["multi-factor-auth", "email-password"]
+
+# [[example]]
+# name = "account_linking_example"
+# required-features = ["account-linking", "email-password"]
+
+# [[example]]
+# name = "multitenancy_example"
+# required-features = ["multitenancy", "email-password"]
+
+# [[example]]
+# name = "complete_example"
+# required-features = ["all-recipes", "axum-middleware"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
