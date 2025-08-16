@@ -260,7 +260,7 @@ pub async fn get_registration_options(
     user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<RegistrationOptions> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/registration/options", config.api_domain);
     
     let request_body = RegistrationOptionsRequest {
@@ -301,7 +301,7 @@ pub async fn complete_registration(
     user_id: impl Into<String>,
     credential: PublicKeyCredentialAttestation,
 ) -> Result<WebAuthnCredential> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/registration/verify", config.api_domain);
     
     let request_body = CompleteRegistrationRequest {
@@ -345,7 +345,7 @@ pub async fn get_authentication_options(
     email: Option<String>,
     user_id: Option<String>,
 ) -> Result<AuthenticationOptions> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/authentication/options", config.api_domain);
     
     let request_body = AuthenticationOptionsRequest { email, user_id };
@@ -382,7 +382,7 @@ pub async fn complete_authentication(
     config: &SuperTokensConfig,
     credential: PublicKeyCredentialAssertion,
 ) -> Result<WebAuthnUser> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/authentication/verify", config.api_domain);
     
     let request_body = CompleteAuthenticationRequest { credential };
@@ -425,7 +425,7 @@ pub async fn get_user_credentials(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Vec<WebAuthnCredential>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/credentials", config.api_domain);
     
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -451,7 +451,7 @@ pub async fn remove_credential(
     config: &SuperTokensConfig,
     credential_id: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/credential", config.api_domain);
     
     let mut request = client.delete(&url).query(&[("credentialId", credential_id.into())]);
@@ -480,7 +480,7 @@ pub async fn does_email_exist(
     tenant_id: Option<String>,
     email: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/email/exists", config.api_domain);
     
     let tenant_id = tenant_id.unwrap_or_else(|| "public".to_string());
@@ -516,7 +516,7 @@ pub async fn sign_up(
     email: impl Into<String>,
     credential: PublicKeyCredentialAttestation,
 ) -> Result<(WebAuthnUser, bool)> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/signup", config.api_domain);
     
     let request_body = serde_json::json!({
@@ -562,7 +562,7 @@ pub async fn sign_in(
     tenant_id: Option<String>,
     credential: PublicKeyCredentialAssertion,
 ) -> Result<WebAuthnUser> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/signin", config.api_domain);
     
     let request_body = serde_json::json!({
@@ -603,7 +603,7 @@ pub async fn get_user_by_id(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Option<WebAuthnUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/user", config.api_domain);
     
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -633,7 +633,7 @@ pub async fn get_user_by_email(
     tenant_id: Option<String>,
     email: impl Into<String>,
 ) -> Result<Option<WebAuthnUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/user/email", config.api_domain);
     
     let tenant_id = tenant_id.unwrap_or_else(|| "public".to_string());
@@ -665,7 +665,7 @@ pub async fn create_reset_password_token(
     tenant_id: Option<String>,
     user_id: impl Into<String>,
 ) -> Result<String> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/user/reset/token", config.api_domain);
     
     let request_body = serde_json::json!({
@@ -706,7 +706,7 @@ pub async fn reset_password_using_token(
     token: impl Into<String>,
     new_credential: PublicKeyCredentialAttestation,
 ) -> Result<String> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/user/reset", config.api_domain);
     
     let request_body = serde_json::json!({
@@ -772,7 +772,7 @@ pub async fn list_users_by_credential_id(
     tenant_id: Option<String>,
     credential_id: impl Into<String>,
 ) -> Result<Vec<WebAuthnUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/webauthn/users", config.api_domain);
     
     let tenant_id = tenant_id.unwrap_or_else(|| "public".to_string());
@@ -795,8 +795,8 @@ pub async fn list_users_by_credential_id(
     Ok(users)
 }
 
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
+
+fn crate::create_http_client(config: &SuperTokensConfig) -> Result<Client> {
     let client = Client::builder()
         .timeout(std::time::Duration::from_secs(config.options.timeout_seconds))
         .build()?;

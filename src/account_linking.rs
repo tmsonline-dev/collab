@@ -155,7 +155,7 @@ pub async fn create_primary_user(
     config: &SuperTokensConfig,
     recipe_user_id: impl Into<String>,
 ) -> Result<CreatePrimaryUserResult> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/accountlinking/user/primary", config.api_domain);
 
     let request_body = CreatePrimaryUserRequest {
@@ -210,7 +210,7 @@ pub async fn link_accounts(
     recipe_user_id: impl Into<String>,
     primary_user_id: impl Into<String>,
 ) -> Result<AccountLinkingResult> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/accountlinking/user/link", config.api_domain);
 
     let request_body = LinkAccountsRequest {
@@ -266,7 +266,7 @@ pub async fn unlink_account(
     config: &SuperTokensConfig,
     recipe_user_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/accountlinking/user/unlink", config.api_domain);
 
     let request_body = UnlinkAccountRequest {
@@ -304,7 +304,7 @@ pub async fn can_link_accounts(
     recipe_user_id: impl Into<String>,
     primary_user_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!(
         "{}/recipe/accountlinking/user/link/check",
         config.api_domain
@@ -345,7 +345,7 @@ pub async fn get_user(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Option<LinkedUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/user/id", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -375,7 +375,7 @@ pub async fn list_users_by_account_info(
     tenant_id: impl Into<String>,
     account_info: AccountInfo,
 ) -> Result<Vec<LinkedUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/users", config.api_domain);
 
     let mut query_params = vec![("tenantId", tenant_id.into())];
@@ -424,7 +424,7 @@ pub async fn delete_user(
     user_id: impl Into<String>,
     remove_all_linked_accounts: bool,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/user/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -468,7 +468,7 @@ pub async fn get_primary_user_that_can_be_linked_to_recipe_user_id(
     tenant_id: impl Into<String>,
     recipe_user_id: impl Into<String>,
 ) -> Result<Option<LinkedUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!(
         "{}/recipe/accountlinking/user/primary/check",
         config.api_domain
@@ -521,12 +521,4 @@ pub fn find_login_method_by_recipe(user: &LinkedUser, recipe_id: &str) -> Option
         .find(|method| method.recipe_id == recipe_id)
 }
 
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
-}
+

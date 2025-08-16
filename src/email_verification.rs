@@ -1,7 +1,6 @@
 //! Email verification recipe
 
 use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 /// Email verification mode
@@ -85,7 +84,7 @@ pub async fn create_email_verification_token(
     recipe_user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<String> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify/token", config.api_domain);
 
     let request_body = CreateEmailVerificationTokenRequest {
@@ -132,7 +131,7 @@ pub async fn verify_email_using_token(
     tenant_id: impl Into<String>,
     token: impl Into<String>,
 ) -> Result<(String, String)> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify", config.api_domain);
 
     let request_body = VerifyEmailUsingTokenRequest {
@@ -187,7 +186,7 @@ pub async fn create_email_verification_link(
     recipe_user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<String> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify/link", config.api_domain);
 
     let request_body = CreateEmailVerificationLinkRequest {
@@ -234,7 +233,7 @@ pub async fn is_email_verified(
     recipe_user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify", config.api_domain);
 
     let mut request = client.get(&url).query(&[
@@ -271,7 +270,7 @@ pub async fn unverify_email(
     recipe_user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -303,7 +302,7 @@ pub async fn send_email_verification_email(
     user_id: impl Into<String>,
     email: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/email/verify", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -327,14 +326,4 @@ pub async fn send_email_verification_email(
     }
 
     Ok(())
-}
-
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
 }

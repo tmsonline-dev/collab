@@ -171,7 +171,7 @@ pub async fn create_or_update_tenant(
     tenant_id: impl Into<String>,
     tenant_config: TenantConfig,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant", config.api_domain);
 
     let request_body = CreateOrUpdateTenantRequest {
@@ -209,7 +209,7 @@ pub async fn get_tenant(
     config: &SuperTokensConfig,
     tenant_id: impl Into<String>,
 ) -> Result<Option<Tenant>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant", config.api_domain);
 
     let mut request = client.get(&url).query(&[("tenantId", tenant_id.into())]);
@@ -242,7 +242,7 @@ pub async fn get_tenant(
 
 /// List all tenants
 pub async fn list_all_tenants(config: &SuperTokensConfig) -> Result<Vec<Tenant>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant/list", config.api_domain);
 
     let mut request = client.get(&url);
@@ -275,7 +275,7 @@ pub async fn delete_tenant(
     config: &SuperTokensConfig,
     tenant_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -314,7 +314,7 @@ pub async fn create_or_update_third_party_config(
     provider_config: ProviderConfig,
     skip_validation: Option<bool>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!(
         "{}/recipe/multitenancy/config/thirdparty",
         config.api_domain
@@ -363,7 +363,7 @@ pub async fn delete_third_party_config(
     tenant_id: impl Into<String>,
     third_party_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!(
         "{}/recipe/multitenancy/config/thirdparty/remove",
         config.api_domain
@@ -410,7 +410,7 @@ pub async fn associate_user_to_tenant(
     tenant_id: impl Into<String>,
     recipe_user_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant/user", config.api_domain);
 
     let request_body = AssociateUserToTenantRequest {
@@ -460,7 +460,7 @@ pub async fn disassociate_user_from_tenant(
     tenant_id: impl Into<String>,
     recipe_user_id: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!(
         "{}/recipe/multitenancy/tenant/user/remove",
         config.api_domain
@@ -573,12 +573,4 @@ pub fn create_enterprise_tenant_config(
     }
 }
 
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
-}
+

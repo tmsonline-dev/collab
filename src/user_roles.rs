@@ -1,7 +1,6 @@
 //! User roles and permissions management (RBAC)
 
 use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 /// Role information
@@ -129,7 +128,7 @@ pub async fn create_new_role_or_add_permissions(
     role: impl Into<String>,
     permissions: Vec<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/role", config.api_domain);
 
     let request_body = CreateRoleRequest {
@@ -169,7 +168,7 @@ pub async fn add_role_to_user(
     user_id: impl Into<String>,
     role: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/role", config.api_domain);
 
     let request_body = AddRoleToUserRequest {
@@ -211,7 +210,7 @@ pub async fn remove_user_role(
     user_id: impl Into<String>,
     role: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/role/remove", config.api_domain);
 
     let request_body = RemoveUserRoleRequest {
@@ -251,7 +250,7 @@ pub async fn get_roles_for_user(
     tenant_id: impl Into<String>,
     user_id: impl Into<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/roles", config.api_domain);
 
     let mut request = client
@@ -287,7 +286,7 @@ pub async fn get_users_that_have_role(
     tenant_id: impl Into<String>,
     role: impl Into<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/role/users", config.api_domain);
 
     let mut request = client
@@ -323,7 +322,7 @@ pub async fn get_permissions_for_role(
     config: &SuperTokensConfig,
     role: impl Into<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/role/permissions", config.api_domain);
 
     let mut request = client.get(&url).query(&[("role", role.into())]);
@@ -354,7 +353,7 @@ pub async fn get_permissions_for_role(
 
 /// Get all roles
 pub async fn get_all_roles(config: &SuperTokensConfig) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/roles", config.api_domain);
 
     let mut request = client.get(&url);
@@ -388,7 +387,7 @@ pub async fn remove_permissions_from_role(
     role: impl Into<String>,
     permissions: Vec<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/role/permissions/remove", config.api_domain);
 
     let request_body = RemovePermissionsFromRoleRequest {
@@ -427,7 +426,7 @@ pub async fn get_roles_that_have_permission(
     config: &SuperTokensConfig,
     permission: impl Into<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/permission/roles", config.api_domain);
 
     let mut request = client.get(&url).query(&[("permission", permission.into())]);
@@ -457,7 +456,7 @@ pub async fn get_roles_that_have_permission(
 
 /// Delete a role
 pub async fn delete_role(config: &SuperTokensConfig, role: impl Into<String>) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/role/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -525,14 +524,4 @@ pub async fn user_has_permission(
     }
 
     Ok(false)
-}
-
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
 }

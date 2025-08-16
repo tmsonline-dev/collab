@@ -4,9 +4,7 @@ use rand::rngs::SmallRng;
 
 #[cfg(feature = "user-roles")]
 use crate::user_roles;
-use crate::{
-    Result, config::SuperTokensConfig, errors::SuperTokensError, utils::create_http_client,
-};
+use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
 use chrono::{DateTime, Utc};
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
@@ -341,7 +339,7 @@ async fn verify_session_basic(
     config: &SuperTokensConfig,
     access_token: &str,
 ) -> Result<SessionInfo> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/verify", config.api_domain);
 
     let request_body = VerifySessionRequest {
@@ -393,7 +391,7 @@ pub async fn refresh_session(
     config: &SuperTokensConfig,
     refresh_token: &str,
 ) -> Result<RefreshResult> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/refresh", config.api_domain);
 
     let request_body = RefreshSessionRequest {
@@ -466,7 +464,7 @@ pub async fn revoke_session(
     config: &SuperTokensConfig,
     session_handles: Vec<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/remove", config.api_domain);
 
     let request_body = RevokeSessionRequest { session_handles };
@@ -502,7 +500,7 @@ pub async fn update_session_data(
     session_handle: &str,
     user_data: HashMap<String, serde_json::Value>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/data", config.api_domain);
 
     let request_body = UpdateSessionDataRequest {
@@ -540,7 +538,7 @@ pub async fn update_session_data(
 
 /// Get all session handles for a user
 pub async fn get_user_sessions(config: &SuperTokensConfig, user_id: &str) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/user", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id)]);
@@ -585,7 +583,7 @@ pub async fn get_session_information(
     config: &SuperTokensConfig,
     session_handle: &str,
 ) -> Result<Option<SessionInfo>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session", config.api_domain);
 
     let mut request = client.get(&url).query(&[("sessionHandle", session_handle)]);
@@ -615,7 +613,7 @@ pub async fn update_access_token_payload(
     session_handle: &str,
     new_access_token_payload: HashMap<String, serde_json::Value>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/jwt/data", config.api_domain);
 
     let request_body = serde_json::json!({

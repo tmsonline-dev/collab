@@ -1,8 +1,6 @@
 //! JWT/OpenID Connect recipe for token creation and verification
 
-use crate::{
-    Result, config::SuperTokensConfig, errors::SuperTokensError, utils::create_http_client,
-};
+use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
 use chrono::{DateTime, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, TokenData, Validation, decode, decode_header};
 use serde::{Deserialize, Serialize};
@@ -147,7 +145,7 @@ pub async fn create_jwt(
     validity_seconds: Option<i64>,
     algorithm: Option<String>,
 ) -> Result<JwtResult> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/jwt", config.api_domain);
 
     let request_body = CreateJwtRequest {
@@ -192,7 +190,7 @@ pub async fn create_jwt(
 
 /// Get JWKS (JSON Web Key Set) for JWT verification
 pub async fn get_jwks(config: &SuperTokensConfig) -> Result<Jwks> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/jwt/jwks", config.api_domain);
 
     let mut request = client.get(&url);
@@ -227,7 +225,7 @@ pub async fn get_jwks(config: &SuperTokensConfig) -> Result<Jwks> {
 pub async fn get_openid_discovery_configuration(
     config: &SuperTokensConfig,
 ) -> Result<OpenIdDiscoveryConfiguration> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/.well-known/openid-configuration", config.api_domain);
 
     let mut request = client.get(&url);

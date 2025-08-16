@@ -2,7 +2,6 @@
 
 use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
 use chrono::{DateTime, Utc};
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 /// User information from email/password sign up or sign in
@@ -78,7 +77,7 @@ pub async fn sign_up(
     email: impl Into<String>,
     password: impl Into<String>,
 ) -> Result<EmailPasswordUser> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/signup", config.api_domain);
 
     let request_body = SignUpRequest {
@@ -120,7 +119,7 @@ pub async fn sign_in(
     email: impl Into<String>,
     password: impl Into<String>,
 ) -> Result<EmailPasswordUser> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/signin", config.api_domain);
 
     let request_body = SignInRequest {
@@ -161,7 +160,7 @@ pub async fn request_password_reset(
     config: &SuperTokensConfig,
     email: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/password/reset/token", config.api_domain);
 
     let request_body = ResetPasswordRequest {
@@ -200,7 +199,7 @@ pub async fn reset_password_with_token(
     token: impl Into<String>,
     new_password: impl Into<String>,
 ) -> Result<String> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/password/reset", config.api_domain);
 
     let request_body = ResetPasswordVerifyRequest {
@@ -246,7 +245,7 @@ pub async fn get_user_by_email(
     config: &SuperTokensConfig,
     email: impl Into<String>,
 ) -> Result<Option<EmailPasswordUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user", config.api_domain);
 
     let mut request = client.get(&url).query(&[("email", email.into())]);
@@ -275,7 +274,7 @@ pub async fn get_user_by_id(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Option<EmailPasswordUser>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -305,7 +304,7 @@ pub async fn update_user_email(
     user_id: impl Into<String>,
     new_email: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -333,14 +332,4 @@ pub async fn update_user_email(
     }
 
     Ok(())
-}
-
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
 }

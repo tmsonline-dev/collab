@@ -187,7 +187,7 @@ pub async fn get_mfa_requirements_for_auth(
     completed_factors: HashMap<String, i64>,
     user: User,
 ) -> Result<MfaRequirements> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/mfa/requirements", config.api_domain);
 
     let request_body = GetMfaRequirementsRequest {
@@ -236,7 +236,7 @@ pub async fn mark_factor_as_complete_in_session(
     session_handle: impl Into<String>,
     factor_id: FactorId,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/mfa/complete", config.api_domain);
 
     let factor_id_str = match factor_id {
@@ -284,7 +284,7 @@ pub async fn create_totp_device(
     user_id: impl Into<String>,
     device_name: Option<String>,
 ) -> Result<(String, String, String)> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/totp/device", config.api_domain);
 
     let request_body = CreateTotpDeviceRequest {
@@ -344,7 +344,7 @@ pub async fn verify_totp_token(
     token: impl Into<String>,
     allow_unverified_devices: bool,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/totp/verify", config.api_domain);
 
     let request_body = VerifyTotpRequest {
@@ -387,7 +387,7 @@ pub async fn list_totp_devices(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Vec<TotpDevice>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/totp/device/list", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -423,7 +423,7 @@ pub async fn remove_totp_device(
     user_id: impl Into<String>,
     device_name: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/totp/device/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -481,12 +481,4 @@ pub fn is_mfa_complete_for_session(mfa_claim: &MfaClaim, required_factors: &[Fac
         })
 }
 
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
-}
+

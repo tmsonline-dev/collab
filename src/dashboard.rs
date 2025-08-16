@@ -2,7 +2,6 @@
 
 use crate::{Result, config::SuperTokensConfig, errors::SuperTokensError};
 use chrono::{DateTime, Utc};
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -182,7 +181,7 @@ pub async fn create_dashboard_user(
     email: impl Into<String>,
     password: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/dashboard/user", config.api_domain);
 
     let request_body = CreateDashboardUserRequest {
@@ -223,7 +222,7 @@ pub async fn update_dashboard_user(
     new_email: Option<String>,
     new_password: Option<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/dashboard/user", config.api_domain);
 
     let request_body = UpdateDashboardUserRequest {
@@ -264,7 +263,7 @@ pub async fn delete_dashboard_user(
     config: &SuperTokensConfig,
     email: impl Into<String>,
 ) -> Result<bool> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/dashboard/user", config.api_domain);
 
     let request_body = DeleteDashboardUserRequest {
@@ -304,7 +303,7 @@ pub async fn get_users(
     pagination_token: Option<String>,
     include_recipe_ids: Option<Vec<String>>,
 ) -> Result<UserSearchResult> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/users", config.api_domain);
 
     let mut query_params = Vec::new();
@@ -355,7 +354,7 @@ pub async fn get_user_by_id(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Option<DashboardUserInfo>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/user/id", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -384,7 +383,7 @@ pub async fn get_user_sessions(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Vec<DashboardSessionInfo>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/user", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -417,7 +416,7 @@ pub async fn revoke_all_sessions_for_user(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<Vec<String>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/session/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -459,7 +458,7 @@ pub async fn get_user_metadata(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<UserMetadata> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/usermetadata", config.api_domain);
 
     let mut request = client.get(&url).query(&[("userId", user_id.into())]);
@@ -503,7 +502,7 @@ pub async fn update_user_metadata(
     user_id: impl Into<String>,
     metadata_update: serde_json::Value,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/usermetadata", config.api_domain);
 
     let request_body = UpdateUserMetadataRequest {
@@ -541,7 +540,7 @@ pub async fn clear_user_metadata(
     config: &SuperTokensConfig,
     user_id: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/usermetadata/remove", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -572,7 +571,7 @@ pub async fn update_user_email(
     new_email: impl Into<String>,
     apply_email_verification_required_flag: Option<bool>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -610,7 +609,7 @@ pub async fn update_user_password(
     new_password: impl Into<String>,
     apply_password_policy: Option<bool>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/user/password", config.api_domain);
 
     let request_body = serde_json::json!({
@@ -646,7 +645,7 @@ pub async fn get_tenant_info(
     config: &SuperTokensConfig,
     tenant_id: impl Into<String>,
 ) -> Result<serde_json::Value> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/multitenancy/tenant", config.api_domain);
 
     let mut request = client.get(&url).query(&[("tenantId", tenant_id.into())]);
@@ -665,14 +664,4 @@ pub async fn get_tenant_info(
 
     let tenant_info: serde_json::Value = response.json().await?;
     Ok(tenant_info)
-}
-
-/// Create HTTP client with timeout
-fn create_http_client(config: &SuperTokensConfig) -> Result<Client> {
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(
-            config.options.timeout_seconds,
-        ))
-        .build()?;
-    Ok(client)
 }

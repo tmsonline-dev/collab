@@ -1,7 +1,7 @@
 //! OAuth2 social authentication recipe - COMPLETE VERSION
 
 use crate::{
-    Result, config::SuperTokensConfig, errors::SuperTokensError, utils::create_http_client,
+    Result, config::SuperTokensConfig, errors::SuperTokensError, ,
 };
 use chrono::{DateTime, Utc};
 use reqwest::Client;
@@ -230,7 +230,7 @@ pub async fn get_authorization_url(
     provider_id: impl Into<String>,
     redirect_uri: impl Into<String>,
 ) -> Result<(String, String)> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/authorization-url", config.api_domain);
 
     let request_body = AuthorizationUrlRequest {
@@ -280,7 +280,7 @@ pub async fn sign_in_up_with_code(
     state: Option<String>,
     pkce_code_verifier: Option<String>,
 ) -> Result<(OAuth2User, bool)> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/signin-up", config.api_domain);
 
     let request_body = OAuth2SignInUpRequest {
@@ -330,7 +330,7 @@ pub async fn get_user_by_third_party_id(
     provider_id: impl Into<String>,
     third_party_user_id: impl Into<String>,
 ) -> Result<Option<OAuth2User>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/user", config.api_domain);
 
     let mut request = client.get(&url).query(&[
@@ -363,7 +363,7 @@ pub async fn get_user_by_email(
     tenant_id: Option<String>,
     email: impl Into<String>,
 ) -> Result<Option<OAuth2User>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/user/email", config.api_domain);
 
     let tenant_id = tenant_id.unwrap_or_else(|| "public".to_string());
@@ -392,7 +392,7 @@ pub async fn get_user_by_email(
 
 /// List all configured OAuth2 providers
 pub async fn get_providers(config: &SuperTokensConfig) -> Result<Vec<OAuth2Provider>> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/providers", config.api_domain);
 
     let mut request = client.get(&url);
@@ -419,7 +419,7 @@ pub async fn unlink_account(
     user_id: impl Into<String>,
     provider_id: impl Into<String>,
 ) -> Result<()> {
-    let client = create_http_client(config)?;
+    let client = crate::create_http_client(config)?;
     let url = format!("{}/recipe/oauth2/unlink", config.api_domain);
 
     let request_body = serde_json::json!({
