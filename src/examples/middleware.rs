@@ -1,9 +1,15 @@
 //! Axum middleware for SuperTokens session verification and user extraction
+//!
+//! This module provides drop-in middleware for Axum applications to:
+//! - Verify SuperTokens sessions automatically
+//! - Extract user information from sessions
+//! - Handle session refresh automatically
+//! - Provide user data as extractors in handlers
 
 use crate::{
     config::SuperTokensConfig,
     errors::{Result, SuperTokensError},
-    session::{SessionContext, SessionInfo, refresh_session_with_retry, verify_session},
+    session::{SessionContext, SessionInfo, refresh_session, verify_session},
 };
 
 use axum::{
@@ -125,10 +131,7 @@ pub async fn supertokens_middleware(
     Extension(config): Extension<SuperTokensMiddlewareConfig>,
     mut req: Request,
     next: Next,
-) -> Result<Response>
-where
-    Request: Send + 'static,
-{
+) -> Result<Response> {
     let session_data = extract_session_from_request(&cookies, req.headers(), &config).await?;
 
     // Insert session data into request extensions
@@ -191,8 +194,7 @@ async fn extract_session_from_request(
         Err(SuperTokensError::InvalidToken(_)) => {
             // Try to refresh if we have a refresh token
             if let Some(ref_token) = &refresh_token {
-                let refresh_result =
-                    refresh_session_with_retry(&config.config, ref_token, None).await?;
+                let refresh_result = refresh_session(&config.config, ref_token).await?;
                 refresh_result.session
             } else {
                 return Err(SuperTokensError::SessionExpired);

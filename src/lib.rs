@@ -8,6 +8,7 @@
 pub mod config;
 pub mod errors;
 pub mod session;
+pub mod session_re;
 pub mod utils;
 
 // Authentication recipes
